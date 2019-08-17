@@ -9,9 +9,9 @@ public class BaseEntity {
     @Id
     private String id;
     @Field(value = "a_date")
-    private Date added;
+    private Date added=new Date();
     @Field(value = "u_date")
-    private Date updated;
+    private Date updated=new Date();
 
     public String getId() {
         return id;

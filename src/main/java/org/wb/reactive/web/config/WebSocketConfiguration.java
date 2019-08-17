@@ -26,6 +26,11 @@ class WebSocketConfiguration {
     Executor executor() {
         return Executors.newSingleThreadExecutor();
     }
+
+    @Bean
+    Flux<ProfileCreatedEvent>  profileCreatedEvents(ProfileCreatedEventPublisher profileCreatedEventPublisher){
+       return Flux.create(profileCreatedEventPublisher).share();
+    }
     @Bean
     HandlerMapping handlerMapping(WebSocketHandler wsh) {
         return new SimpleUrlHandlerMapping() {
@@ -42,10 +47,9 @@ class WebSocketConfiguration {
     }
 
     @Bean
-    WebSocketHandler webSocketHandler(ObjectMapper objectMapper, ProfileCreatedEventPublisher profileCreatedEventPublisher) {
-        Flux<ProfileCreatedEvent> publish = Flux.create(profileCreatedEventPublisher).share();
+    WebSocketHandler webSocketHandler(ObjectMapper objectMapper, Flux<ProfileCreatedEvent>  profileCreatedEvents ) {
         return session -> {
-            Flux<WebSocketMessage> messageFlux = publish.map(evt -> {
+            Flux<WebSocketMessage> messageFlux = profileCreatedEvents.map(evt -> {
                     try {
                         return objectMapper.writeValueAsString(evt.getSource());
                     }
@@ -53,7 +57,6 @@ class WebSocketConfiguration {
                         throw new RuntimeException(e);
                     }
                 }).map(str -> {
-                    log.info("Sending " + str);
                     return session.textMessage(str);
                 });
             return session.send(messageFlux);

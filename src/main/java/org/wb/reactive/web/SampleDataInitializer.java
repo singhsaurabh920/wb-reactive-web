@@ -15,7 +15,7 @@ import java.util.Random;
 
 @Log4j2
 @Component
-@org.springframework.context.annotation.Profile("demo")
+@org.springframework.context.annotation.Profile("Sample")
 class SampleDataInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     private final ProfileRepository repository;

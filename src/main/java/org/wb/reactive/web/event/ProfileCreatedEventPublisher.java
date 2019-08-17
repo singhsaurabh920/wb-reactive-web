@@ -28,14 +28,14 @@ public class ProfileCreatedEventPublisher implements ApplicationListener<Profile
      @Override
     public void accept(FluxSink<ProfileCreatedEvent> sink) {
         this.executor.execute(() -> {
-            while (true)
+            while (true) {
                 try {
                     ProfileCreatedEvent event = queue.take();
                     sink.next(event);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     ReflectionUtils.rethrowRuntimeException(e);
                 }
+            }
         });
     }
 }
