@@ -32,8 +32,10 @@ public class ProfileService {
     public Mono<Profile> update(String id, String email) {
         return this.profileRepository
             .findById(id)
-            .map(p -> new Profile(p.getId(), email))
-            .flatMap(this.profileRepository::save);
+            .map(p -> {
+                p.setEmail(email);
+                return p;
+            }).flatMap(this.profileRepository::save);
     }
 
     public Mono<Profile> delete(String id) {
@@ -42,9 +44,9 @@ public class ProfileService {
             .flatMap(p -> this.profileRepository.deleteById(p.getId()).thenReturn(p));
     }
 
-    public Mono<Profile> create(String email) {
+    public Mono<Profile> create(Profile profile) {
         return this.profileRepository
-            .save(new Profile(null, email))
-            .doOnSuccess(profile -> this.publisher.publishEvent(new ProfileCreatedEvent(profile)));
+            .save(profile)
+            .doOnSuccess(p -> this.publisher.publishEvent(new ProfileCreatedEvent(p)));
     }
 }

@@ -18,9 +18,8 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class ProfileEndpointConfiguration {
     private static final Logger logger = LogManager.getLogger(ProfileEndpointConfiguration.class);
 
-
     @Bean
-    @Profile("!classic")
+    @Profile("functional")
     RouterFunction<ServerResponse> routes(ProfileHandler handler) {
         return route(i(GET("/profiles")), handler::all)
             .andRoute(i(GET("/profiles/{id}")), handler::getById)

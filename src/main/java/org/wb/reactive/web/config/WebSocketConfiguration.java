@@ -53,7 +53,7 @@ class WebSocketConfiguration {
                         throw new RuntimeException(e);
                     }
                 }).map(str -> {
-                    log.info("sending " + str);
+                    log.info("Sending " + str);
                     return session.textMessage(str);
                 });
             return session.send(messageFlux);

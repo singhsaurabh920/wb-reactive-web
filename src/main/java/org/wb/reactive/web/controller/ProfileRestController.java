@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import org.wb.reactive.web.domain.enity.Profile;
 import org.wb.reactive.web.domain.service.ProfileService;
 import org.wb.reactive.web.endpoint.config.ProfileEndpointConfiguration;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/profiles", produces = MediaType.APPLICATION_JSON_VALUE)
-@org.springframework.context.annotation.Profile("classic")
+@org.springframework.context.annotation.Profile("!functional")
 public class ProfileRestController {
     private static final Logger logger = LogManager.getLogger(ProfileRestController.class);
 
@@ -26,31 +27,34 @@ public class ProfileRestController {
         this.profileService = profileService;
     }
 
-    @GetMapping
-    Publisher<Profile> getAll() {
+    @RequestMapping
+    Flux<Profile> getAll() {
         return this.profileService.all();
-    }
-
-    @GetMapping("/{id}")
-    Publisher<Profile> getById(@PathVariable("id") String id) {
-        return this.profileService.get(id);
     }
 
     @PostMapping
     Publisher<ResponseEntity<Profile>> create(@RequestBody Profile profile) {
-        return this.profileService.create(profile.getEmail())
-            .map(p -> ResponseEntity.created(URI.create("/profiles/" + p.getId())).contentType(mediaType).build());
+        return this.profileService.create(profile)
+                .map(p -> ResponseEntity.ok().contentType(this.mediaType).build());
+
+    }
+
+    @GetMapping("/{id}")
+    Publisher<ResponseEntity<Profile>> find(@PathVariable("id") String id) {
+        return this.profileService.get(id)
+                .map(p -> ResponseEntity.ok().contentType(this.mediaType).build());
     }
 
     @DeleteMapping("/{id}")
-    Publisher<Profile> deleteById(@PathVariable String id) {
-        return this.profileService.delete(id);
+    Publisher<ResponseEntity<Profile>> delete(@PathVariable String id) {
+        return this.profileService.delete(id)
+                .map(p -> ResponseEntity.ok().contentType(this.mediaType).build());
     }
 
     @PutMapping("/{id}")
-    Publisher<ResponseEntity<Profile>> updateById(@PathVariable String id, @RequestBody Profile profile) {
+    Publisher<ResponseEntity<Profile>> update(@PathVariable String id, @RequestBody Profile profile) {
         return Mono.just(profile)
-            .flatMap(p -> this.profileService.update(id, p.getEmail()))
-            .map(p -> ResponseEntity.ok().contentType(this.mediaType).build());
+                .flatMap(p -> this.profileService.update(id, p.getEmail()))
+                .map(p -> ResponseEntity.ok().contentType(this.mediaType).build());
     }
 }

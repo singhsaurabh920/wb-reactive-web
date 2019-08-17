@@ -1,7 +1,7 @@
 oidc:
   issuer-uri: https://dev-737523.oktapreview.com/oauth2/default
-  client-id: 0oagbqbpk4qmJDpaS0h7
-  client-secret: dagQjCjCJ51Tvqz1jSlelcQ0xSkK5_VwuHmJK7MQ
+  client-id: 0oa14vu0ojknUEao2357
+  client-secret: IlH4AQR2nCiGyuI7ycZuzARc9XzZsqxruiEQGAzP
 
 spring:
   security:

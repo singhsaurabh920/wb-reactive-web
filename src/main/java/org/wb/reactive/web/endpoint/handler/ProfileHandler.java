@@ -1,5 +1,6 @@
 package org.wb.reactive.web.endpoint.handler;
 
+import com.mongodb.Mongo;
 import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -21,8 +22,8 @@ public class ProfileHandler {
         this.profileService = profileService;
     }
 
-    public Mono<ServerResponse> getById(ServerRequest r) {
-        return defaultReadResponse(this.profileService.get(id(r)));
+    public Mono<ServerResponse> getById(ServerRequest request) {
+        return defaultReadResponse(this.profileService.get(id(request)));
     }
 
     public Mono<ServerResponse> all(ServerRequest request) {
@@ -34,32 +35,31 @@ public class ProfileHandler {
     }
 
     public  Mono<ServerResponse> updateById(ServerRequest request) {
-        Flux<Profile> id = request
-                .bodyToFlux(Profile.class)
+        Mono<Profile> id = request
+                .bodyToMono(Profile.class)
                 .flatMap(p -> this.profileService.update(id(request), p.getEmail()));
-        return defaultReadResponse(id);
+        return defaultWriteResponse(id);
     }
 
     public Mono<ServerResponse> create(ServerRequest request) {
-        Flux<Profile> flux = request
-                .bodyToFlux(Profile.class)
-                .flatMap(p -> this.profileService.create(p.getEmail()));
-        return defaultWriteResponse(flux);
+        Mono<Profile> mono = request
+                .bodyToMono(Profile.class)
+                .flatMap(p -> this.profileService.create(p));
+        return defaultWriteResponse(mono);
     }
 
-    private static Mono<ServerResponse> defaultWriteResponse(Publisher<Profile> profiles) {
-        return Mono.from(profiles)
-                .flatMap(p -> ServerResponse
-                .created(URI.create("/profiles/" + p.getId()))
+    private static Mono<ServerResponse> defaultWriteResponse(Publisher<Profile> profile) {
+        return ServerResponse
+                .ok()
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .build());
+                .body(profile, Profile.class);
     }
 
-    private static Mono<ServerResponse> defaultReadResponse(Publisher<Profile> profiles) {
+    private static Mono<ServerResponse> defaultReadResponse(Publisher<Profile> profile) {
         return ServerResponse
             .ok()
             .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .body(profiles, Profile.class);
+            .body(profile, Profile.class);
     }
 
     private static String id(ServerRequest r) {
