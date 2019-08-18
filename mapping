@@ -1,6 +1,0 @@
- curl -v -X POST  http://localhost:8080/profiles -H "content-type: application/json" -d'{"name":"saurabh","email":"saurabh@worldbuild.com","phone":"8948698899","website":"worldbulid.com"}' |json_pp
- curl -v -X PUT  http://localhost:8080/profiles/5d5997a5291aa140094c67d1 -H "content-type: application/json" -d'{"name":"Shivam","email":"shivam@worldbuild.com","phone":"74389303002","website":"worldbulid.com"}' |json_pp
- curl -v -X GET localhost:8080/profiles |json_pp
- curl -v -X GET localhost:8080/profiles/5d59979a291aa140094c67d0 |json_pp
- curl -v -X DELETE localhost:8080/profiles/5d59979a291aa140094c67d0
- curl -v -X GET localhost:8080/profiles/event
