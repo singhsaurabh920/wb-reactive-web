@@ -10,7 +10,7 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
-import org.wb.reactive.web.event.ProfileCreatedEvent;
+import org.wb.reactive.web.event.ProfileEvent;
 import org.wb.reactive.web.event.ProfileCreatedEventPublisher;
 import reactor.core.publisher.Flux;
 
@@ -28,7 +28,7 @@ class WebSocketConfiguration {
     }
 
     @Bean
-    Flux<ProfileCreatedEvent>  profileCreatedEvents(ProfileCreatedEventPublisher profileCreatedEventPublisher){
+    Flux<ProfileEvent>  profileCreatedEvents(ProfileCreatedEventPublisher profileCreatedEventPublisher){
        return Flux.create(profileCreatedEventPublisher).share();
     }
     @Bean
@@ -47,7 +47,7 @@ class WebSocketConfiguration {
     }
 
     @Bean
-    WebSocketHandler webSocketHandler(ObjectMapper objectMapper, Flux<ProfileCreatedEvent>  profileCreatedEvents ) {
+    WebSocketHandler webSocketHandler(ObjectMapper objectMapper, Flux<ProfileEvent>  profileCreatedEvents ) {
         return session -> {
             Flux<WebSocketMessage> messageFlux = profileCreatedEvents.map(evt -> {
                     try {
@@ -56,9 +56,7 @@ class WebSocketConfiguration {
                     catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
-                }).map(str -> {
-                    return session.textMessage(str);
-                });
+                }).map(session::textMessage);
             return session.send(messageFlux);
         };
     }

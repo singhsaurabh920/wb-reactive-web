@@ -37,7 +37,7 @@ public class ProfileHandler {
     public  Mono<ServerResponse> updateById(ServerRequest request) {
         Mono<Profile> id = request
                 .bodyToMono(Profile.class)
-                .flatMap(p -> this.profileService.update(id(request), p.getEmail()));
+                .flatMap(p -> this.profileService.update(id(request), p));
         return defaultWriteResponse(id);
     }
 
